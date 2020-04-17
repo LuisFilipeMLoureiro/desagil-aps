@@ -1,16 +1,9 @@
 package br.pro.hashi.ensino.desagil.aps.view;
 
-
 import javax.swing.*;
 import java.awt.*;
 
-// Componente criada especialmente para o projeto, que é
-// basicamente um JPanel de tamanho fixo. Fixar tamanho
-// geralmente não é considerada uma boa prática de design
-// de interface, mas fazemos isso aqui por simplicidade.
-public class FixedPanel extends JPanel {
-
-    // O construtor recebe a largura e a altura do painel.
+public class FixedPanel  extends JPanel {
     protected FixedPanel(int width, int height) {
 
         // É muito importante estabelecer que esse painel

@@ -1,34 +1,29 @@
 package br.pro.hashi.ensino.desagil.aps.model;
 
 public class AndGate extends Gate {
-    private final NandGate nand0;
-    private final NandGate nand1;
-
+    private final NandGate nandLeft;
+    private final NandGate nandRight;
 
     public AndGate() {
-        super("AND", 1);
-        nand0 = new NandGate();
-        nand1 = new NandGate();
+        super("AND", 2);
+
+        nandLeft = new NandGate();
+
+        nandRight = new NandGate();
+        nandRight.connect(0, nandLeft);
+        nandRight.connect(1, nandLeft);
     }
 
     @Override
     public boolean read() {
-        return nand1.read();
+        return nandRight.read();
     }
 
     @Override
     public void connect(int inputIndex, Emitter emitter) {
-        if (inputIndex != 0 && inputIndex != 1) {
+        if (inputIndex < 0 || inputIndex > 1) {
             throw new IndexOutOfBoundsException(inputIndex);
         }
-        if (inputIndex == 0) {
-            nand0.connect(0, emitter);
-        } else {
-            nand0.connect(1, emitter);
-            nand1.connect(0, nand0);
-            nand1.connect(1, nand0);
-
-
-        }
+        nandLeft.connect(inputIndex, emitter);
     }
 }

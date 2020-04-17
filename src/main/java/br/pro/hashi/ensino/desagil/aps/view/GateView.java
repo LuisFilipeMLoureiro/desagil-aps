@@ -1,91 +1,82 @@
 package br.pro.hashi.ensino.desagil.aps.view;
-import br.pro.hashi.ensino.desagil.aps.model.Gate;
+
+import br.pro.hashi.ensino.desagil.aps.model.*;
 
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.net.URL;
 
-public class GateView extends FixedPanel implements ActionListener, MouseListener{
+public class GateView extends FixedPanel implements ActionListener, MouseListener {
     private final Gate gate;
 
-    boolean
+    private final JCheckBox checkBox1;
+    private final JCheckBox checkBox2;
+    private final JCheckBox checkBoxresult;
 
-    private final JCheckBox entrada1 = new JCheckBox("Entrada 1");
-    private final JCheckBox entrada2 = new JCheckBox("Entrada 2");
-    private final JCheckBox saida = new JCheckBox("Saída");
-    // Novos atributos necessários para esta versão da interface.
-    private Color color;
 
     public GateView(Gate gate) {
-
-        // Como subclasse de FixedPanel, esta classe agora
-        // exige que uma largura e uma altura sejam fixadas.
         super(245, 346);
 
         this.gate = gate;
+        checkBox1 = new JCheckBox("Entrada 1");
+        checkBox2 = new JCheckBox("Entrada 2");
+        checkBoxresult = new JCheckBox("Result");
 
+        add(checkBox1, 85, 10, 150, 25);
+        if (gate.getInputSize() == 2) {
+            add(checkBox2, 85, 45, 150, 25);
+        };
+        add(checkBoxresult, 85, 311, 120, 25);
 
-        JLabel entradaLabel = new JLabel("Entradas:");
-        JLabel saidaLabel = new JLabel("Saída:");
+        checkBoxresult.setEnabled(false);
+        checkBox1.addActionListener(this);
+        checkBox2.addActionListener(this);
 
-
-        // Não há mais a chamada de setLayout, pois ela agora
-        // acontece no construtor da superclasse FixedPanel.
-
-        // Como subclasse de FixedPanel, agora podemos definir a
-        // posição e o tamanho de cada componente ao adicioná-la.
-        add(entradaLabel, 10, 10, 75, 25);
-        add(entrada1, 10, 45, 150, 25);
-        add(entrada2, 10, 80, 150, 25);
-        add(saidaLabel, 10, 250, 75, 25);
-        add(saida, 10, 311, 120, 25);
-
-        // Inicializamos o atributo de cor simplesmente como preto.
-        color = Color.BLACK;
-
-
-
-        entrada1.addActionListener(this);
-        entrada2.addActionListener(this);
-
-        saida.setEnabled(false);
-
-        // Toda componente Swing tem uma lista de observadores
-        // que reagem quando algum evento de mouse acontece.
-        // Usamos o método addMouseListener para adicionar a
-        // própria componente, ou seja "this", nessa lista.
-        // Só que addMouseListener espera receber um objeto
-        // do tipo MouseListener como parâmetro. É por isso que
-        // adicionamos o "implements MouseListener" lá em cima.
         addMouseListener(this);
 
-        // update();
+        update();
     }
 
-    private void itemStateChanged(ItemEvent e) {
+    private void update() {
+        Boolean entrada1;
+        Boolean entrada2;
 
-        result = gate.
-    }
+        entrada1 = checkBox1.isSelected();
+        entrada2 = checkBox2.isSelected();
 
-    /*private void update() {
-        double weight;
-        double radius;
+        System.out.println(entrada1);
+        System.out.println(entrada2);
 
-        try {
-            weight = Double.parseDouble(entrada1.get());
-            radius = Double.parseDouble(entrada2.getText());
-        } catch (NumberFormatException exception) {
-            resultField.setText("?");
-            return;
-        }
+        Switch switch1 = new Switch();
+        Switch switch2 = new Switch();
 
-        boolean result = gate.read();
+        if (entrada1) {
+            switch1.turnOn();
+        };
+        this.gate.connect(0, switch1);
 
-        resultField.setText(Double.toString(result));
-    }
-*/
+        if (this.gate.getInputSize() > 1) {
+            if (entrada2) {
+                switch2.turnOn();
+            };
+            this.gate.connect(1, switch2);
+        };
+
+
+        Boolean result = this.gate.read();
+
+
+        if (result) {
+            checkBoxresult.setSelected(true);
+        } else {
+            checkBoxresult.setSelected(false);
+        };
+    };
 
     @Override
     public void actionPerformed(ActionEvent event) {
@@ -95,19 +86,6 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
     @Override
     public void mouseClicked(MouseEvent event) {
 
-        // Descobre em qual posição o clique ocorreu.
-        int x = event.getX();
-        int y = event.getY();
-
-        // Se o clique foi dentro do quadrado colorido...
-        if (x >= 210 && x < 235 && y >= 311 && y < 336) {
-
-            // ...então abrimos a janela seletora de cor...
-            color = JColorChooser.showDialog(this, null, color);
-
-            // ...e chamamos repaint para atualizar a tela.
-            repaint();
-        }
     }
 
     @Override
@@ -140,22 +118,6 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
 
     @Override
     public void paintComponent(Graphics g) {
-
-        // Não podemos esquecer desta linha, pois não somos os
-        // únicos responsáveis por desenhar o painel, como era
-        // o caso nos Desafios. Agora é preciso desenhar também
-        // componentes internas, e isso é feito pela superclasse.
-        super.paintComponent(g);
-
-        // Desenha a imagem, passando sua posição e seu tamanho.
-        g.drawImage(image, 10, 80, 221, 221, this);
-
-        // Desenha um quadrado cheio.
-        g.setColor(color);
-        g.fillRect(210, 311, 25, 25);
-
-        // Linha necessária para evitar atrasos
-        // de renderização em sistemas Linux.
-        getToolkit().sync();
     }
+
 }
