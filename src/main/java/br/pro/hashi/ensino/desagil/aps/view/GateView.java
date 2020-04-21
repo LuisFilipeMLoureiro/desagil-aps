@@ -16,24 +16,38 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
 
     private final JCheckBox checkBox1;
     private final JCheckBox checkBox2;
-    private final JCheckBox checkBoxresult;
+
+    private final Image image;
+    private Color color;
+
+    private Light light = new Light(255, 0, 0);
 
 
     public GateView(Gate gate) {
-        super(245, 346);
+        super(345, 246);
 
         this.gate = gate;
-        checkBox1 = new JCheckBox("Entrada 1");
-        checkBox2 = new JCheckBox("Entrada 2");
-        checkBoxresult = new JCheckBox("Result");
+        checkBox1 = new JCheckBox("");
+        checkBox2 = new JCheckBox("");
 
-        add(checkBox1, 85, 10, 150, 25);
         if (gate.getInputSize() == 2) {
-            add(checkBox2, 85, 45, 150, 25);
+            add(checkBox1, 30, 70, 150, 25);
+            add(checkBox2, 30, 150, 150, 25);
+        }
+        else
+        {
+            add(checkBox1, 30, 110, 150, 25);
         };
-        add(checkBoxresult, 85, 311, 120, 25);
 
-        checkBoxresult.setEnabled(false);
+//        add(checkBoxresult, 273, 110, 120, 25);
+
+        color = light.getColor();
+
+        // Usamos esse carregamento nos Desafios, vocês lembram?
+        String name = gate.toString() + ".png";
+        URL url = getClass().getClassLoader().getResource(name);
+        image = getToolkit().getImage(url);
+
         checkBox1.addActionListener(this);
         checkBox2.addActionListener(this);
 
@@ -70,12 +84,10 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
 
         Boolean result = this.gate.read();
 
+        light.connect(0, this.gate);
 
-        if (result) {
-            checkBoxresult.setSelected(true);
-        } else {
-            checkBoxresult.setSelected(false);
-        };
+        color = light.getColor();
+        repaint();
     };
 
     @Override
@@ -86,6 +98,24 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
     @Override
     public void mouseClicked(MouseEvent event) {
 
+        // Descobre em qual posição o clique ocorreu.
+        int x = event.getX();
+        int y = event.getY();
+
+        System.out.println(x);
+        System.out.println(y);
+
+        // Se o clique foi dentro do quadrado colorido...
+        //if (x >= 0 && x < 25 && y >= 0 && y < 25) {
+        if (Math.pow((x-285.5),2) + Math.pow((y-122.5), 2) <= 156.25) {
+            System.out.println("INSIDE");
+
+        // ...então abrimos a janela seletora de cor...
+            light.setColor( JColorChooser.showDialog(this, null, color) );
+
+            // ...e chamamos repaint para atualizar a tela.
+            update();
+        }
     }
 
     @Override
@@ -118,6 +148,22 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
 
     @Override
     public void paintComponent(Graphics g) {
-    }
 
+        // Não podemos esquecer desta linha, pois não somos os
+        // únicos responsáveis por desenhar o painel, como era
+        // o caso nos Desafios. Agora é preciso desenhar também
+        // componentes internas, e isso é feito pela superclasse.
+        super.paintComponent(g);
+
+        // Desenha a imagem, passando sua posição e seu tamanho.
+        g.drawImage(image, 50, 40, 230, 160, this);
+
+        // Desenha um quadrado cheio.
+        g.setColor(color);
+        g.fillOval(273, 110, 25, 25);
+
+        // Linha necessária para evitar atrasos
+        // de renderização em sistemas Linux.
+        getToolkit().sync();
+    }
 }

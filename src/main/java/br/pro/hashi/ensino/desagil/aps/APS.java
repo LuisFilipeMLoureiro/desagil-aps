@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import br.pro.hashi.ensino.desagil.aps.model.*;
 import br.pro.hashi.ensino.desagil.aps.view.View;
 
-public class Aps {
+public class APS {
     public static void main(String[] args) {
 
         // Constrói o modelo, que é simplesmente uma lista
